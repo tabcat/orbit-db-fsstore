@@ -1,0 +1,25 @@
+{
+  "name": "@tabcat/orbit-db-fsstore",
+  "version": "1.0.0",
+  "description": "a custom orbit-db store representing a file system",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tabcat/orbit-db-fsstore.git"
+  },
+  "keywords": [
+    "orbitdb",
+    "orbit-db-store",
+    "crdt",
+    "filesystem"
+  ],
+  "author": "andersb@tuta.io",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tabcat/orbit-db-fsstore/issues"
+  },
+  "homepage": "https://github.com/tabcat/orbit-db-fsstore#readme"
+}
