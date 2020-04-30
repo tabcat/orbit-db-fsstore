@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/tabcat/orbit-db-fsstore/issues"
   },
-  "homepage": "https://github.com/tabcat/orbit-db-fsstore#readme"
+  "homepage": "https://github.com/tabcat/orbit-db-fsstore#readme",
+  "dependencies": {
+    "orbit-db-store": "^3.2.0"
+  }
 }
