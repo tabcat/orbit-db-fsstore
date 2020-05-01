@@ -4,7 +4,10 @@
   "description": "a custom orbit-db store representing a file system",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
+  },
+  "standard": {
+    "env": "mocha"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,7 @@
   },
   "homepage": "https://github.com/tabcat/orbit-db-fsstore#readme",
   "dependencies": {
+    "mocha": "^7.1.2",
     "orbit-db-store": "^3.2.0"
   }
 }
