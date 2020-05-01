@@ -22,7 +22,7 @@ const cTypes = {
 const setRoot = (mapInstance) => mapInstance.set('/', { type: cTypes.dir })
 
 // creates an fs with a root dir
-const create = () => setRoot(new Map())
+const create = (state) => setRoot(new Map(state))
 
 // reset fs state
 const reset = (fs) => { fs.clear(); return setRoot(fs) }
@@ -35,7 +35,7 @@ function tree (fs, path) {
   const a = []
   for (const p of fs.keys()) {
     if (
-      path === '/' || path === p ||
+      path !== p &&
       (path === p.slice(0, path.length) && p.charAt(path) === '/')
     ) {
       a.push(p)
@@ -68,8 +68,9 @@ function rmdir (fs, path) {
   if (fs.has(path) && fs.get(path).type === cTypes.dir) {
     const pathTree = tree(fs, path)
     for (const p of pathTree) {
-      if (p !== '/') fs.delete(p)
+      fs.delete(p)
     }
+    fs.delete(path)
   }
 }
 
@@ -79,9 +80,9 @@ function mvdir (fs, path, dest, name) {
     fs.has(path) && fs.has(dest) && !fs.has(combinedPath(dest, name)) &&
     fs.get(path).type === cTypes.dir && fs.get(dest).type === cTypes.dir
   ) {
-    if (!tree(path).includes(dest)) {
-      const pathTree = tree(fs, path)
-      for (const p of pathTree) {
+    const paths = [path, ...tree(fs, path)]
+    if (!paths.includes(dest)) {
+      for (const p of paths) {
         fs.set(`${combinedPath(dest, name)}${p.slice(path.length)}`, fs.get(p))
         fs.delete(p)
       }
@@ -95,9 +96,9 @@ function cpdir (fs, path, dest, name) {
     fs.has(path) && fs.has(dest) && !fs.has(combinedPath(dest, name)) &&
     fs.get(path).type === cTypes.dir && fs.get(dest).type === cTypes.dir
   ) {
-    if (!tree(path).includes(dest)) {
-      const pathTree = tree(fs, path)
-      for (const p of pathTree) {
+    const paths = [path, ...tree(fs, path)]
+    if (!paths.includes(dest)) {
+      for (const p of paths) {
         fs.set(`${combinedPath(dest, name)}${p.slice(path.length)}`, fs.get(p))
       }
     }
