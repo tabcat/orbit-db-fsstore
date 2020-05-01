@@ -2,7 +2,7 @@
 'use strict'
 const Store = require('orbit-db-store')
 const FSIndex = require('./FSIndex')
-const { combinedPath, tree, ls, opcodes } = require('./fs')
+const { combinedPath, tree, ls, opcodes } = require('./FS')
 
 class FSStore extends Store {
   constructor (ipfs, identity, dbname, options) {

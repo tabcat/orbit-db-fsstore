@@ -1,37 +1,37 @@
 
 'use strict'
-const fs = require('./fs')
-const { opcodes } = fs
+const FS = require('./FS')
+const { opcodes } = FS
 
 const fsReducer = (state) => (acc, { payload }, idx) => {
   try {
     switch (payload.op) {
       case opcodes.MKDIR:
-        fs.mkdir(state, payload.path, payload.name)
+        FS.mkdir(state, payload.path, payload.name)
         break
       case opcodes.RMDIR:
-        fs.rmdir(state, payload.path)
+        FS.rmdir(state, payload.path)
         break
       case opcodes.MVDIR:
-        fs.mvdir(state, payload.path, payload.dest, payload.name)
+        FS.mvdir(state, payload.path, payload.dest, payload.name)
         break
       case opcodes.CPDIR:
-        fs.cpdir(state, payload.path, payload.dest, payload.name)
+        FS.cpdir(state, payload.path, payload.dest, payload.name)
         break
       case opcodes.MK:
-        fs.mk(state, payload.path, payload.name)
+        FS.mk(state, payload.path, payload.name)
         break
       case opcodes.WRITE:
-        fs.write(state, payload.path, payload.content)
+        FS.write(state, payload.path, payload.content)
         break
       case opcodes.RM:
-        fs.rm(state, payload.path)
+        FS.rm(state, payload.path)
         break
       case opcodes.MV:
-        fs.mv(state, payload.path, payload.dest, payload.name)
+        FS.mv(state, payload.path, payload.dest, payload.name)
         break
       case opcodes.CP:
-        fs.cp(state, payload.path, payload.dest, payload.name)
+        FS.cp(state, payload.path, payload.dest, payload.name)
     }
   } catch (e) {
     console.log(e)
@@ -40,7 +40,7 @@ const fsReducer = (state) => (acc, { payload }, idx) => {
 
 class FSIndex {
   constructor () {
-    this._index = fs.create()
+    this._index = FS.create()
   }
 
   get () {
@@ -48,7 +48,7 @@ class FSIndex {
   }
 
   updateIndex (oplog) {
-    fs.reset(this.index)
+    FS.reset(this.index)
 
     oplog.values
       .filter(e => e && e.payload)
