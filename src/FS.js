@@ -19,7 +19,7 @@ const cTypes = {
   file: 'file'
 }
 
-const setRoot = (mapInstance) => mapInstance.set('/', { type: cTypes.dir })
+const setRoot = (mapInstance) => mapInstance.set('/r', { type: cTypes.dir })
 
 // creates an fs with a root dir
 const create = (state) => setRoot(new Map(state))
@@ -27,17 +27,12 @@ const create = (state) => setRoot(new Map(state))
 // reset fs state
 const reset = (fs) => { fs.clear(); return setRoot(fs) }
 
-const combinedPath = (path, ...names) => path === '/'
-  ? `/${names.join('/')}`
-  : `${path}/${names.join('/')}`
+const combinedPath = (path, ...names) => `${path}/${names.join('/')}`
 
 function tree (fs, path) {
   const a = []
   for (const p of fs.keys()) {
-    if (
-      path !== p &&
-      (path === p.slice(0, path.length) && p.charAt(path) === '/')
-    ) {
+    if (`${path}/` === p.slice(0, path.length + 1)) {
       a.push(p)
     }
   }
@@ -45,12 +40,8 @@ function tree (fs, path) {
 }
 
 function ls (fs, path) {
-  if (fs.has(path) && fs.get(path).type === cTypes.dir) {
-    return tree(fs, path)
-      .filter(p => path.split('/').length + 1 === p.split('/').length)
-  } else {
-    throw new Error(`path:${path} is not a directory`)
-  }
+  return tree(fs, path)
+    .filter(p => path.split('/').length + 1 === p.split('/').length)
 }
 
 // make directory at path + name
@@ -66,11 +57,10 @@ function mkdir (fs, path, name) {
 // remove directory at path
 function rmdir (fs, path) {
   if (fs.has(path) && fs.get(path).type === cTypes.dir) {
-    const pathTree = tree(fs, path)
-    for (const p of pathTree) {
+    const paths = [path, ...tree(fs, path)]
+    for (const p of paths) {
       fs.delete(p)
     }
-    fs.delete(path)
   }
 }
 
