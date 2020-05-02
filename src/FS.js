@@ -155,5 +155,6 @@ module.exports = {
   mv,
   cp,
   opcodes,
-  cTypes
+  cTypes,
+  combinedPath
 }
