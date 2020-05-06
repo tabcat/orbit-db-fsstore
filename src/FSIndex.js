@@ -48,7 +48,7 @@ class FSIndex {
   }
 
   updateIndex (oplog) {
-    FS.reset(this.index)
+    FS.reset(this._index)
 
     oplog.values
       .filter(e => e && e.payload)
