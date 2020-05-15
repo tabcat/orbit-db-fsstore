@@ -27,7 +27,9 @@ const create = (state) => setRoot(new Map(state))
 // reset fs state
 const reset = (fs) => { fs.clear(); return setRoot(fs) }
 
-const combinedPath = (path, ...names) => `${path}/${names.join('/')}`
+const exists = (fs, path) => fs.has(path)
+
+const joinPath = (path, ...names) => `${path}/${names.join('/')}`
 
 function tree (fs, path) {
   const a = []
@@ -47,10 +49,10 @@ function ls (fs, path) {
 // make directory at path + name
 function mkdir (fs, path, name) {
   if (
-    fs.has(path) && !fs.has(combinedPath(path, name)) &&
+    fs.has(path) && !fs.has(joinPath(path, name)) &&
     fs.get(path).type === cTypes.dir
   ) {
-    fs.set(combinedPath(path, name), { type: cTypes.dir })
+    fs.set(joinPath(path, name), { type: cTypes.dir })
   }
 }
 
@@ -67,13 +69,13 @@ function rmdir (fs, path) {
 // move directory at path to destination path + name
 function mvdir (fs, path, dest, name) {
   if (
-    fs.has(path) && fs.has(dest) && !fs.has(combinedPath(dest, name)) &&
+    fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.dir && fs.get(dest).type === cTypes.dir
   ) {
     const paths = [path, ...tree(fs, path)]
     if (!paths.includes(dest)) {
       for (const p of paths) {
-        fs.set(`${combinedPath(dest, name)}${p.slice(path.length)}`, fs.get(p))
+        fs.set(`${joinPath(dest, name)}${p.slice(path.length)}`, fs.get(p))
         fs.delete(p)
       }
     }
@@ -83,13 +85,13 @@ function mvdir (fs, path, dest, name) {
 // copy directory at path to destination path + name
 function cpdir (fs, path, dest, name) {
   if (
-    fs.has(path) && fs.has(dest) && !fs.has(combinedPath(dest, name)) &&
+    fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.dir && fs.get(dest).type === cTypes.dir
   ) {
     const paths = [path, ...tree(fs, path)]
     if (!paths.includes(dest)) {
       for (const p of paths) {
-        fs.set(`${combinedPath(dest, name)}${p.slice(path.length)}`, fs.get(p))
+        fs.set(`${joinPath(dest, name)}${p.slice(path.length)}`, fs.get(p))
       }
     }
   }
@@ -98,10 +100,10 @@ function cpdir (fs, path, dest, name) {
 // make file at path + name
 function mk (fs, path, name) {
   if (
-    fs.has(path) && !fs.has(combinedPath(path, name)) &&
+    fs.has(path) && !fs.has(joinPath(path, name)) &&
     fs.get(path).type === cTypes.dir
   ) {
-    fs.set(combinedPath(path, name), { type: cTypes.file, content: null })
+    fs.set(joinPath(path, name), { type: cTypes.file, content: null })
   }
 }
 
@@ -122,10 +124,10 @@ function rm (fs, path) {
 // move file at path to destination path + name
 function mv (fs, path, dest, name) {
   if (
-    fs.has(path) && fs.has(dest) && !fs.has(combinedPath(dest, name)) &&
+    fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.file && fs.get(dest).type === cTypes.dir
   ) {
-    fs.set(combinedPath(dest, name), fs.get(path))
+    fs.set(joinPath(dest, name), fs.get(path))
     fs.delete(path)
   }
 }
@@ -133,16 +135,17 @@ function mv (fs, path, dest, name) {
 // copy file at path to destination path + name
 function cp (fs, path, dest, name) {
   if (
-    fs.has(path) && fs.has(dest) && !fs.has(combinedPath(dest, name)) &&
+    fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.file && fs.get(dest).type === cTypes.dir
   ) {
-    fs.set(combinedPath(dest, name), fs.get(path))
+    fs.set(joinPath(dest, name), fs.get(path))
   }
 }
 
 module.exports = {
   create,
   reset,
+  exists,
   tree,
   ls,
   mkdir,
@@ -156,5 +159,5 @@ module.exports = {
   cp,
   opcodes,
   cTypes,
-  combinedPath
+  joinPath
 }
