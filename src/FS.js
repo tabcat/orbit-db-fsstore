@@ -19,7 +19,7 @@ const cTypes = {
   file: 'file'
 }
 
-const setRoot = (mapInstance) => mapInstance.set('/r', { type: cTypes.dir })
+const setRoot = (fs) => fs.set('/r', { type: cTypes.dir })
 
 // creates an fs with a root dir
 const create = (state) => setRoot(new Map(state))
