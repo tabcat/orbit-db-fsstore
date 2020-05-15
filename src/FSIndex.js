@@ -1,9 +1,10 @@
 
 'use strict'
+
 const FS = require('./FS')
 const { opcodes } = FS
 
-const fsReducer = (state) => (acc, { payload }, idx) => {
+const fsReducer = (state) => ({ payload } = {}) => {
   try {
     switch (payload.op) {
       case opcodes.MKDIR:
@@ -51,7 +52,6 @@ class FSIndex {
     FS.reset(this._index)
 
     oplog.values
-      .filter(e => e && e.payload)
       .map(fsReducer(this._index))
   }
 }
