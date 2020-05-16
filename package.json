@@ -28,5 +28,10 @@
   "dependencies": {
     "mocha": "^7.1.2",
     "orbit-db-store": "^3.2.0"
+  },
+  "devDependencies": {
+    "orbit-db": "^0.23.1",
+    "orbit-db-test-utils": "^0.9.3",
+    "rimraf": "^3.0.2"
   }
 }
