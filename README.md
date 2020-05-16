@@ -1,3 +1,4 @@
+[![npm (scoped)](https://img.shields.io/npm/v/@tabcat/orbit-db-fsstore)](https://www.npmjs.com/package/@tabcat/orbit-db-fsstore)
 # orbit-db-fsstore
 an orbit-db store representing a file system
 
