@@ -13,6 +13,26 @@ a custom orbit-db store representing a file system
 const newPath = fsstore.joinPath('/r/this/is/a', 'path')
 // '/r/this/is/a/path'
 ```
+### .exists(path)
+> returns a bool, true if path exists and false if not
+```js
+const exists = fsstore.exists('/r/file1')
+// true
+```
+### .content(path)
+> returns the content type at path or undefined if path doesn't exist
+```js
+const json = fsstore.content('/r')
+// 'dir'
+const json = fsstore.content('/r/file1')
+// 'file'
+```
+### .read(path)
+> returns the json data written at path or undefined if path doesn't exist
+```js
+const json = fsstore.read('/r/file1')
+// { hello: 'ipfs cid' }
+```
 ### .tree(path)
 > return an array of all paths located *under* the path in the store state
 ```js
@@ -55,18 +75,11 @@ const entryHash = await fsstore.cpdir('/r/dir1', '/r', 'dir1')
 ```js
 const entryHash = await fsstore.mk('/r', 'file1')
 ```
-### .write(path, content)
-> map content (any JSON-serializable value) to a file path (*!!! do not store blob data in orbitdb, ONLY REFERENCES*)
+### .write(path, json)
+> map json (any JSON-serializable value) to a file path (*!!! do not store blob data in orbitdb, ONLY REFERENCES*)
 > returns a Promise that resolves to a String that is the multihash of the entry.
 ```js
 const entryHash = await fsstore.write('/r/file1', { hello: 'ipfs cid' })
-```
-### .read(path)
-> read content at file path
-> returns the content at path or undefined if path doesn't exist
-```js
-const content = fsstore.read('/r/file1')
-// { hello: 'ipfs cid' }
 ```
 ### .rm(path)
 > remove an existing file at path
