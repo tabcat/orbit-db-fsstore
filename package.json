@@ -4,7 +4,7 @@
   "description": "a custom orbit-db store representing a file system",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "cross-env TEST=all mocha"
   },
   "standard": {
     "env": "mocha"
@@ -29,6 +29,7 @@
     "orbit-db-store": "^3.2.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.2",
     "mocha": "^7.1.2",
     "orbit-db": "^0.23.1",
     "orbit-db-test-utils": "^0.9.3",

@@ -40,9 +40,10 @@ Object.keys(testAPIs).forEach(API => {
 
     it('creates and opens a database', async () => {
       db = await orbitdb1.create('orbit-db-tests', FSStore.type, { replicate: false })
-      assert.strict.notEqual(db, null)
       assert.strict.equal(db.type, FSStore.type)
       assert.strict.equal(db.dbname, 'orbit-db-tests')
+      assert.strict.equal(db.address.toString(), dbAddr.toString())
+      await db.drop()
     })
 
     it('static .type returns store type', async () => {
