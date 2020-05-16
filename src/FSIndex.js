@@ -48,6 +48,10 @@ class FSIndex {
     return this._index
   }
 
+  read (key) {
+    return this._index.get(key) && this._index.get(key).content
+  }
+
   updateIndex (oplog) {
     FS.reset(this._index)
 
