@@ -29,6 +29,10 @@ const reset = (fs) => { fs.clear(); return setRoot(fs) }
 
 const exists = (fs, path) => fs.has(path)
 
+const content = (fs, path) => fs.get(path) && fs.get(path).type
+
+const read = (fs, path) => fs.get(path) && fs.get(path).json
+
 const joinPath = (path, ...names) => `${path}/${names.join('/')}`
 
 function tree (fs, path) {
@@ -103,14 +107,14 @@ function mk (fs, path, name) {
     fs.has(path) && !fs.has(joinPath(path, name)) &&
     fs.get(path).type === cTypes.dir
   ) {
-    fs.set(joinPath(path, name), { type: cTypes.file, content: null })
+    fs.set(joinPath(path, name), { type: cTypes.file, json: null })
   }
 }
 
-// write file content to path
-function write (fs, path, content) {
+// write json data to path
+function write (fs, path, json) {
   if (fs.has(path) && fs.get(path).type === cTypes.file) {
-    fs.set(path, { type: cTypes.file, content })
+    fs.set(path, { type: cTypes.file, json })
   }
 }
 
@@ -146,6 +150,8 @@ module.exports = {
   create,
   reset,
   exists,
+  content,
+  read,
   tree,
   ls,
   mkdir,

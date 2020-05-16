@@ -23,7 +23,7 @@ const fsReducer = (state) => ({ payload } = {}) => {
         FS.mk(state, payload.path, payload.name)
         break
       case opcodes.WRITE:
-        FS.write(state, payload.path, payload.content)
+        FS.write(state, payload.path, payload.json)
         break
       case opcodes.RM:
         FS.rm(state, payload.path)
@@ -46,10 +46,6 @@ class FSIndex {
 
   get () {
     return this._index
-  }
-
-  read (key) {
-    return this._index.get(key) && this._index.get(key).content
   }
 
   updateIndex (oplog) {

@@ -5,7 +5,7 @@ const FS = require('../src/FS')
 
 describe('FS', function () {
   const dirContent = { type: 'dir' }
-  const fileContent = { type: 'file', content: true }
+  const fileContent = { type: 'file', json: true }
 
   const fsState1 = [['/r', dirContent]]
   const fsState2 = [['/r/dir1', dirContent]]
@@ -43,6 +43,57 @@ describe('FS', function () {
     assert.deepStrictEqual([...fs.entries()], fsState)
     FS.reset(fs)
     assert.deepStrictEqual([...fs.entries()], fsState1)
+  })
+
+  describe('exists', function () {
+    it('return true if directory path exists', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.exists(fs, '/r'), true)
+    })
+
+    it('return true if file path exists', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.exists(fs, '/r/file1'), true)
+    })
+
+    it('return false if path does not exist', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.exists(fs, 'does not exist'), false)
+    })
+  })
+
+  describe('content', function () {
+    it('return directory content type for directory path', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.content(fs, '/r'), 'dir')
+    })
+
+    it('return file content type for file path', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.content(fs, '/r/file1'), 'file')
+    })
+
+    it('return undefined for non-existing path', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.content(fs, 'does not exist'), undefined)
+    })
+  })
+
+  describe('read', function () {
+    it('return json data at file path', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.read(fs, '/r/file1'), true)
+    })
+
+    it('return undefined at directory path', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.read(fs, '/r'), undefined)
+    })
+
+    it('return undefined for non-existing path', function () {
+      fs = FS.create(fsState)
+      assert.strict.equal(FS.read(fs, 'does not exist'), undefined)
+    })
   })
 
   describe('tree', function () {
@@ -303,7 +354,7 @@ describe('FS', function () {
     it('make a file in an existing directory', function () {
       fs = FS.create(fsState)
       FS.mk(fs, '/r', 'make-here')
-      const makeFileContent = { type: 'file', content: null }
+      const makeFileContent = { type: 'file', json: null }
       assert.deepStrictEqual(fs.get('/r/make-here'), makeFileContent)
       assert.deepStrictEqual([...fs.entries()], [...fsState, ['/r/make-here', makeFileContent]])
     })
@@ -338,11 +389,11 @@ describe('FS', function () {
   })
 
   describe('write', function () {
-    const writeFileContent = { type: 'file', content: 'hello' }
+    const writeFileContent = { type: 'file', json: 'hello' }
 
     it('write to an existing file', function () {
       fs = FS.create(fsState)
-      FS.write(fs, '/r/file1', writeFileContent.content)
+      FS.write(fs, '/r/file1', writeFileContent.json)
       assert.deepStrictEqual(fs.get('/r/file1'), writeFileContent)
       assert.deepStrictEqual(
         [...fs.entries()],

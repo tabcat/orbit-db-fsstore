@@ -75,6 +75,19 @@ Object.keys(testAPIs).forEach(API => {
         assert.strict.equal(db.exists('/r'), true)
       })
 
+      it('.content get content type of path', async function () {
+        await db.mk('/r', 'file1')
+        assert.strict.equal(db.content('/r'), 'dir')
+        assert.strict.equal(db.content('/r/file1'), 'file')
+      })
+
+      it('.read read an existing file', async function () {
+        await db.mk('/r', 'file1')
+        await db.write('/r/file1', true)
+        assert.strict.equal(db.read('/r/file1'), true)
+        assert.strict.equal(db.read('/r/file2'), undefined)
+      })
+
       it('.tree tree an existing path', async function () {
         assert.strict.deepEqual(db.tree('/r'), [])
       })
@@ -115,13 +128,7 @@ Object.keys(testAPIs).forEach(API => {
         await db.mk('/r', 'file1')
         await db.write('/r/file1', true)
         assert.strict.deepEqual(db.ls('/r'), ['/r/file1'])
-      })
-
-      it('.read read an existing file', async function () {
-        await db.mk('/r', 'file1')
-        await db.write('/r/file1', true)
         assert.strict.deepEqual(db.read('/r/file1'), true)
-        assert.strict.deepEqual(db.read('/r/file2'), undefined)
       })
 
       it('.rm remove an existing file', async function () {

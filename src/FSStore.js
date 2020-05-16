@@ -3,7 +3,7 @@
 
 const Store = require('orbit-db-store')
 const FSIndex = require('./FSIndex')
-const { joinPath, exists, tree, ls, opcodes } = require('./FS')
+const { joinPath, exists, content, read, tree, ls, opcodes } = require('./FS')
 
 const errors = {
   pathExistNo: (path) => new Error(`path '${path}' does not exist`),
@@ -20,6 +20,8 @@ class FSStore extends Store {
 
     this.joinPath = joinPath
     this.exists = (path = '') => exists(this._index.get(), path)
+    this.content = (path = '') => content(this._index.get(), path)
+    this.read = (path = '') => read(this._index.get(), path)
     this.tree = (path = '') => tree(this._index.get(), path)
     this.ls = (path = '') => ls(this._index.get(), path)
   }
@@ -57,13 +59,9 @@ class FSStore extends Store {
     return this._addOperation({ op: opcodes.MK, path, name })
   }
 
-  write (path, content) {
+  write (path, json) {
     if (!this.exists(path)) throw errors.pathExistNo(path)
-    return this._addOperation({ op: opcodes.WRITE, path, content })
-  }
-
-  read (path) {
-    return this._index.read(path)
+    return this._addOperation({ op: opcodes.WRITE, path, json })
   }
 
   rm (path) {
