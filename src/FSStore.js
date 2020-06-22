@@ -73,6 +73,7 @@ class FSStore extends Store {
   }
 
   write (path, json) {
+    if (!pathValid(path)) throw errors.pathValidNo(path)
     if (!this.exists(path)) throw errors.pathExistNo(path)
     return this._addOperation({ op: opcodes.WRITE, path, json })
   }
