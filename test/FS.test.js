@@ -96,6 +96,12 @@ describe('FS', function () {
     })
   })
 
+  describe('joinPath', function () {
+    it('join path with names', function () {
+      assert.strict.equal(FS.joinPath('/r', 'file1'), '/r/file1')
+    })
+  })
+
   describe('tree', function () {
     it('tree an existing directory with contents', function () {
       fs = FS.create(fsState)
