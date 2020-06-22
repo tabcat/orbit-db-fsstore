@@ -252,7 +252,7 @@ describe('FS', function () {
     it('fail to move an existing file to an existing file', function () {
       fs = FS.create(fsState)
       FS.mvdir(fs, '/r/file1', '/r/file2', 'move-here')
-      assert.deepStrictEqual(fs.get('/asdf/file2/move-here'), undefined)
+      assert.deepStrictEqual(fs.get('/r/file2/move-here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
