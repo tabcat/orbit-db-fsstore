@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "a custom orbit-db store representing a file system",
   "main": "src/index.js",
+  "files": [
+    "/src"
+  ],
   "scripts": {
     "test": "cross-env TEST=all mocha"
   },
