@@ -132,6 +132,11 @@ describe('FS', function () {
     it('join path with names', function () {
       assert.strict.equal(FS.joinPath('/r', 'file1'), '/r/file1')
     })
+
+    it('join path with invalid names throws', function () {
+      assert.throws(FS.joinPath.bind(undefined, '/r', '/file1'))
+      assert.throws(FS.joinPath.bind(undefined, '/r', 'dir1', 'file1/'))
+    })
   })
 
   describe('tree', function () {
@@ -198,6 +203,14 @@ describe('FS', function () {
       fs = FS.create(fsState)
       FS.mkdir(fs, '/r', 'file1')
       assert.deepStrictEqual(fs.get('/r/file1'), fileContent)
+      assert.deepStrictEqual([...fs.entries()], fsState)
+    })
+
+    it('fail to make directory with invalid name', function () {
+      fs = FS.create(fsState)
+      FS.mkdir(fs, '/r', '/invalid')
+      assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
+      assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
   })
@@ -314,6 +327,14 @@ describe('FS', function () {
       assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
+
+    it('fail to move directory to invalid name', function () {
+      fs = FS.create(fsState)
+      FS.mvdir(fs, '/r/dir1', '/r', '/invalid')
+      assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
+      assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
+      assert.deepStrictEqual([...fs.entries()], fsState)
+    })
   })
 
   describe('cpdir', function () {
@@ -386,6 +407,14 @@ describe('FS', function () {
       assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
+
+    it('fail to copy directory to invalid name', function () {
+      fs = FS.create(fsState)
+      FS.cpdir(fs, '/r/dir1', '/r', '/invalid')
+      assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
+      assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
+      assert.deepStrictEqual([...fs.entries()], fsState)
+    })
   })
 
   describe('mk', function () {
@@ -422,6 +451,14 @@ describe('FS', function () {
       fs = FS.create(fsState)
       FS.mk(fs, '/r', 'file1')
       assert.deepStrictEqual(fs.get('/r/file1'), fileContent)
+      assert.deepStrictEqual([...fs.entries()], fsState)
+    })
+
+    it('fail to make file with invalid name', function () {
+      fs = FS.create(fsState)
+      FS.mk(fs, '/r', '/invalid')
+      assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
+      assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
   })
@@ -537,6 +574,14 @@ describe('FS', function () {
       assert.deepStrictEqual(fs.get('/r/dir2/move-here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
+
+    it('fail to move file to invalid name', function () {
+      fs = FS.create(fsState)
+      FS.mv(fs, '/r/file1', '/r', '/invalid')
+      assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
+      assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
+      assert.deepStrictEqual([...fs.entries()], fsState)
+    })
   })
 
   describe('cp', function () {
@@ -585,6 +630,14 @@ describe('FS', function () {
       fs = FS.create(fsState)
       FS.mv(fs, '/r/dir1', '/r/dir2', 'copy-here')
       assert.deepStrictEqual(fs.get('/r/dir2/copy-here'), undefined)
+      assert.deepStrictEqual([...fs.entries()], fsState)
+    })
+
+    it('fail to copy file to invalid name', function () {
+      fs = FS.create(fsState)
+      FS.cp(fs, '/r/file1', '/r', '/invalid')
+      assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
+      assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
   })

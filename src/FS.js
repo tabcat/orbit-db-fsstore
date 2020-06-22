@@ -38,7 +38,10 @@ const pathValid = (path) => typeof path === 'string' && pathPattern.test(path)
 const namePattern = RegExp(/^[^\/\s]+$/) // eslint-disable-line
 const nameValid = (name) => typeof name === 'string' && namePattern.test(name)
 
-const joinPath = (path, ...names) => `${path}/${names.join('/')}`
+function joinPath (path, ...names) {
+  if (!names.every(nameValid)) throw new Error('invalid name supplied')
+  return `${path}/${names.join('/')}`
+}
 
 function tree (fs, path) {
   const a = []
@@ -58,6 +61,7 @@ function ls (fs, path) {
 // make directory at path + name
 function mkdir (fs, path, name) {
   if (
+    nameValid(name) &&
     fs.has(path) && !fs.has(joinPath(path, name)) &&
     fs.get(path).type === cTypes.dir
   ) {
@@ -78,6 +82,7 @@ function rmdir (fs, path) {
 // move directory at path to destination path + name
 function mvdir (fs, path, dest, name) {
   if (
+    nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.dir && fs.get(dest).type === cTypes.dir
   ) {
@@ -94,6 +99,7 @@ function mvdir (fs, path, dest, name) {
 // copy directory at path to destination path + name
 function cpdir (fs, path, dest, name) {
   if (
+    nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.dir && fs.get(dest).type === cTypes.dir
   ) {
@@ -109,6 +115,7 @@ function cpdir (fs, path, dest, name) {
 // make file at path + name
 function mk (fs, path, name) {
   if (
+    nameValid(name) &&
     fs.has(path) && !fs.has(joinPath(path, name)) &&
     fs.get(path).type === cTypes.dir
   ) {
@@ -133,6 +140,7 @@ function rm (fs, path) {
 // move file at path to destination path + name
 function mv (fs, path, dest, name) {
   if (
+    nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.file && fs.get(dest).type === cTypes.dir
   ) {
@@ -144,6 +152,7 @@ function mv (fs, path, dest, name) {
 // copy file at path to destination path + name
 function cp (fs, path, dest, name) {
   if (
+    nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
     fs.get(path).type === cTypes.file && fs.get(dest).type === cTypes.dir
   ) {
