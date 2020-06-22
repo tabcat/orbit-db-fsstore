@@ -33,6 +33,10 @@ const content = (fs, path) => fs.get(path) && fs.get(path).type
 
 const read = (fs, path) => fs.get(path) && fs.get(path).json
 
+// RegExp.test returns true for undefined because String(undefind) === 'undefind'
+const namePattern = RegExp(/^[^\/\s]+$/) // eslint-disable-line
+const nameValid = (name) => typeof name === 'string' && namePattern.test(name)
+
 const joinPath = (path, ...names) => `${path}/${names.join('/')}`
 
 function tree (fs, path) {
@@ -165,5 +169,6 @@ module.exports = {
   cp,
   opcodes,
   cTypes,
+  nameValid,
   joinPath
 }
