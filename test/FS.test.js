@@ -96,6 +96,22 @@ describe('FS', function () {
     })
   })
 
+  describe('pathValid', function () {
+    it('return true for valid names', function () {
+      assert.strict.equal(FS.pathValid('/!'), true)
+      assert.strict.equal(FS.pathValid('/asdf1234!@#$'), true)
+    })
+
+    it('return false for invalid names', function () {
+      assert.strict.equal(FS.pathValid(), false)
+      assert.strict.equal(FS.pathValid(''), false)
+      assert.strict.equal(FS.pathValid({ asdf: 'asdf' }), false)
+      assert.strict.equal(FS.pathValid('/asdf1234!@#$/'), false)
+      assert.strict.equal(FS.pathValid('asdf1234!@#$/'), false)
+      assert.strict.equal(FS.pathValid('asdf1234!@#$'), false)
+    })
+  })
+
   describe('nameValid', function () {
     it('return true for valid names', function () {
       assert.strict.equal(FS.nameValid('!'), true)
