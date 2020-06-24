@@ -24,9 +24,7 @@ const setRoot = (fs) => fs.set('/r', { type: cTypes.dir })
 const create = (state) => setRoot(new Map(state))
 
 const exists = (fs, path) => fs.has(path)
-
 const content = (fs, path) => fs.get(path) && fs.get(path).type
-
 const read = (fs, path) => fs.get(path) && fs.get(path).json
 
 const pathPattern = /^(?:\/[^/\s]+)+$/
