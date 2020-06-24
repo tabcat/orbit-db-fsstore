@@ -50,10 +50,10 @@ class FSIndex {
   }
 
   updateIndex (oplog) {
-    FS.reset(this._index)
+    const fs = FS.create()
 
-    oplog.values
-      .map(fsReducer(this._index))
+    oplog.values.map(fsReducer(fs))
+    this._index = fs
   }
 }
 

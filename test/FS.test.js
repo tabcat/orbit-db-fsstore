@@ -38,13 +38,6 @@ describe('FS', function () {
     assert.deepStrictEqual([...fs.entries()], fsState)
   })
 
-  it('reset a created filesystem', function () {
-    fs = FS.create(fsState)
-    assert.deepStrictEqual([...fs.entries()], fsState)
-    FS.reset(fs)
-    assert.deepStrictEqual([...fs.entries()], fsState1)
-  })
-
   describe('exists', function () {
     it('return true if directory path exists', function () {
       fs = FS.create(fsState)

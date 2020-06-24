@@ -19,13 +19,9 @@ const cTypes = {
   file: 'file'
 }
 
-const setRoot = (fs) => fs.set('/r', { type: cTypes.dir })
-
 // creates an fs with a root dir
+const setRoot = (fs) => fs.set('/r', { type: cTypes.dir })
 const create = (state) => setRoot(new Map(state))
-
-// reset fs state
-const reset = (fs) => { fs.clear(); return setRoot(fs) }
 
 const exists = (fs, path) => fs.has(path)
 
@@ -162,7 +158,6 @@ function cp (fs, path, dest, name) {
 
 module.exports = {
   create,
-  reset,
   exists,
   content,
   read,
