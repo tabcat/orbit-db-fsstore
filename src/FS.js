@@ -29,9 +29,9 @@ const content = (fs, path) => fs.get(path) && fs.get(path).type
 
 const read = (fs, path) => fs.get(path) && fs.get(path).json
 
-const pathPattern = RegExp(/^(?:\/[^/\s]+)+$/) // eslint-disable-line
+const pathPattern = /^(?:\/[^/\s]+)+$/
 const pathValid = (path) => typeof path === 'string' && pathPattern.test(path)
-const namePattern = RegExp(/^[^\/\s]+$/) // eslint-disable-line
+const namePattern = /^[^/\s]+$/
 const nameValid = (name) => typeof name === 'string' && namePattern.test(name)
 
 function joinPath (path, ...names) {
