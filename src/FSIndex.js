@@ -33,6 +33,7 @@ const fsReducer = (state) => ({ payload } = {}) => {
         break
       case opcodes.CP:
         FS.cp(state, payload.path, payload.dest, payload.name)
+        break
     }
   } catch (e) {
     console.log(e)
