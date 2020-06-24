@@ -28,9 +28,6 @@
     "url": "https://github.com/tabcat/orbit-db-fsstore/issues"
   },
   "homepage": "https://github.com/tabcat/orbit-db-fsstore#readme",
-  "dependencies": {
-    "orbit-db-store": "^3.2.0"
-  },
   "devDependencies": {
     "cross-env": "^7.0.2",
     "mocha": "^7.1.2",
