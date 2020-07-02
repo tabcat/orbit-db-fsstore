@@ -27,9 +27,9 @@ const exists = (fs, path) => fs.has(path)
 const content = (fs, path) => fs.get(path) && fs.get(path).type
 const read = (fs, path) => fs.get(path) && fs.get(path).json
 
-const pathPattern = /^(?:\/[^/\s]+)+$/
+const pathPattern = /^(?:\/[^/]+)+$/
 const pathValid = (path) => typeof path === 'string' && pathPattern.test(path)
-const namePattern = /^[^/\s]+$/
+const namePattern = /^[^/]+$/
 const nameValid = (name) => typeof name === 'string' && namePattern.test(name)
 
 function joinPath (path, ...names) {
