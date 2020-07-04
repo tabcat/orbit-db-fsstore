@@ -2,39 +2,11 @@
 'use strict'
 
 const FS = require('./FS')
-const { opcodes } = FS
+const { opcodes, lowercase } = FS
 
-const fsReducer = (state) => ({ payload } = {}) => {
+const fsReducer = (fs) => ({ payload } = {}) => {
   try {
-    switch (payload.op) {
-      case opcodes.MKDIR:
-        FS.mkdir(state, payload.path, payload.name)
-        break
-      case opcodes.RMDIR:
-        FS.rmdir(state, payload.path)
-        break
-      case opcodes.MVDIR:
-        FS.mvdir(state, payload.path, payload.dest, payload.name)
-        break
-      case opcodes.CPDIR:
-        FS.cpdir(state, payload.path, payload.dest, payload.name)
-        break
-      case opcodes.MK:
-        FS.mk(state, payload.path, payload.name)
-        break
-      case opcodes.WRITE:
-        FS.write(state, payload.path, payload.json)
-        break
-      case opcodes.RM:
-        FS.rm(state, payload.path)
-        break
-      case opcodes.MV:
-        FS.mv(state, payload.path, payload.dest, payload.name)
-        break
-      case opcodes.CP:
-        FS.cp(state, payload.path, payload.dest, payload.name)
-        break
-    }
+    if (opcodes[payload.op]) FS[lowercase[payload.op]](fs, payload)
   } catch (e) {
     console.log(e)
   }
@@ -51,7 +23,6 @@ class FSIndex {
 
   updateIndex (oplog) {
     const fs = FS.create()
-
     oplog.values.map(fsReducer(fs))
     this._index = fs
   }

@@ -15,8 +15,8 @@ describe('FS', function () {
     ['/r/file2', fileContent]
   ]
   const fsState5 = [
-    ['/r/dir1/dir2', dirContent],
-    ['/r/dir1/dir2/file3', fileContent]
+    ['/r/dir1/dir3', dirContent],
+    ['/r/dir1/dir3/file3', fileContent]
   ]
   const fsState = [
     ...fsState1,
@@ -26,6 +26,32 @@ describe('FS', function () {
     ...fsState5
   ]
 
+  const paths = {
+    root: { path: '/r' },
+    nonExist: { path: '/r/non-exist' },
+    file1: { path: '/r/file1' },
+    file2: { path: '/r/file2' },
+    dir1: { path: '/r/dir1' },
+    dir2: { path: '/r/dir2' }
+  }
+
+  const dests = {
+    root: { dest: '/r' },
+    nonExist: { dest: '/r/non-exist' },
+    file1: { dest: '/r/file1' },
+    file2: { dest: '/r/file2' },
+    dir1: { dest: '/r/dir1' },
+    dir2: { dest: '/r/dir2' }
+  }
+
+  const names = {
+    here: { name: 'here' },
+    invalid: { name: '/invalid' },
+    file1: { name: 'file1' },
+    file2: { name: 'file2' },
+    dir1: { name: 'dir1' },
+    dir2: { name: 'dir2' }
+  }
   let fs
 
   it('create an empty filesystem', function () {
@@ -127,8 +153,8 @@ describe('FS', function () {
     })
 
     it('join path with invalid names throws', function () {
-      assert.throws(FS.joinPath.bind(undefined, '/r', '/file1'))
-      assert.throws(FS.joinPath.bind(undefined, '/r', 'dir1', 'file1/'))
+      assert.throws(() => FS.joinPath('/r', '/file1'))
+      assert.throws(() => FS.joinPath('/r', 'dir1', 'file1/'))
     })
   })
 
@@ -166,42 +192,42 @@ describe('FS', function () {
   describe('mkdir', function () {
     it('make a directory in an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mkdir(fs, '/r', 'make-here')
-      assert.deepStrictEqual(fs.get('/r/make-here'), dirContent)
-      assert.deepStrictEqual([...fs.entries()], [...fsState, ['/r/make-here', dirContent]])
+      FS.mkdir(fs, { ...paths.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), dirContent)
+      assert.deepStrictEqual([...fs.entries()], [...fsState, ['/r/here', dirContent]])
     })
 
     it('fail to make a directory in an existing file', function () {
       fs = FS.create(fsState)
-      FS.mkdir(fs, '/r/file1', 'make-here')
-      assert.deepStrictEqual(fs.get('/r/file1/make-here'), undefined)
+      FS.mkdir(fs, { ...paths.file1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to make a directory in a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.mkdir(fs, '/r/non-exist', 'make-here')
-      assert.deepStrictEqual(fs.get('/r/non-exist/make-here'), undefined)
+      FS.mkdir(fs, { ...paths.nonExist, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/non-exist/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to overwrite an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mkdir(fs, '/r', 'dir1')
+      FS.mkdir(fs, { ...paths.root, ...names.dir1 })
       assert.deepStrictEqual(fs.get('/r/dir1'), dirContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to overwrite an existing file', function () {
       fs = FS.create(fsState)
-      FS.mkdir(fs, '/r', 'file1')
+      FS.mkdir(fs, { ...paths.root, ...names.file1 })
       assert.deepStrictEqual(fs.get('/r/file1'), fileContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
-    it('fail to make directory with invalid name', function () {
+    it('fail to make directory with an invalid name', function () {
       fs = FS.create(fsState)
-      FS.mkdir(fs, '/r', '/invalid')
+      FS.mkdir(fs, { ...paths.root, ...names.invalid })
       assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
       assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
@@ -211,7 +237,7 @@ describe('FS', function () {
   describe('rmdir', function () {
     it('remove an existing directory with contents', function () {
       fs = FS.create(fsState)
-      FS.rmdir(fs, '/r/dir1')
+      FS.rmdir(fs, { ...paths.dir1 })
       assert.deepStrictEqual(fs.get('/r/dir1'), undefined)
       assert.deepStrictEqual(
         [...fs.entries()],
@@ -221,7 +247,7 @@ describe('FS', function () {
 
     it('remove an existing directory without contents', function () {
       fs = FS.create(fsState)
-      FS.rmdir(fs, '/r/dir2')
+      FS.rmdir(fs, { ...paths.dir2 })
       assert.deepStrictEqual(fs.get('/r/dir2'), undefined)
       assert.deepStrictEqual(
         [...fs.entries()],
@@ -231,14 +257,14 @@ describe('FS', function () {
 
     it('fail to remove an existing file', function () {
       fs = FS.create(fsState)
-      FS.rmdir(fs, '/r/file1')
+      FS.rmdir(fs, { ...paths.file1 })
       assert.deepStrictEqual(fs.get('/r/file1'), fileContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to remove a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.rmdir(fs, '/r/non-exist')
+      FS.rmdir(fs, { ...paths.nonExist })
       assert.deepStrictEqual(fs.get('/r/non-exist'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
@@ -247,25 +273,25 @@ describe('FS', function () {
   describe('mvdir', function () {
     it('move an existing directory with contents to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/dir1', '/r', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/move-here'), dirContent)
+      FS.mvdir(fs, { ...paths.dir1, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), dirContent)
       assert.deepStrictEqual(
         [...fs.entries()],
         [
           ...fsState1,
           ...fsState3,
           ...fsState4,
-          ['/r/move-here', dirContent],
-          ['/r/move-here/dir2', dirContent],
-          ['/r/move-here/dir2/file3', fileContent]
+          ['/r/here', dirContent],
+          ['/r/here/dir3', dirContent],
+          ['/r/here/dir3/file3', fileContent]
         ]
       )
     })
 
     it('move an existing directory without contents to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/dir2', '/r', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/move-here'), dirContent)
+      FS.mvdir(fs, { ...paths.dir2, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), dirContent)
       assert.deepStrictEqual(
         [...fs.entries()],
         [
@@ -274,56 +300,56 @@ describe('FS', function () {
           ...fsState3,
           fsState4[1],
           ...fsState5,
-          ['/r/move-here', dirContent]
+          ['/r/here', dirContent]
         ]
       )
     })
 
     it('fail to move an existing directory to a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/dir1', '/r/non-exist', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/non-exist/move-here'), undefined)
+      FS.mvdir(fs, { ...paths.dir1, ...dests.nonExist, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/non-exist/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move a non-existing path to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/non-exist', '/r', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/move-here'), undefined)
+      FS.mvdir(fs, { ...paths.nonExist, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move an existing file to an existing file', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/file1', '/r/file2', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/file2/move-here'), undefined)
+      FS.mvdir(fs, { ...paths.file1, ...dests.file2, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file2/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move an existing directory to an existing file', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/dir1', '/r/file1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/file1/move-here'), undefined)
+      FS.mvdir(fs, { ...paths.dir1, ...dests.file1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move an existing file to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/file1', '/r/dir1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
+      FS.mvdir(fs, { ...paths.file1, ...dests.dir1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move existing directory to itself', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/dir1', '/r/dir1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
+      FS.mvdir(fs, { ...paths.dir1, ...dests.dir1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move directory to invalid name', function () {
       fs = FS.create(fsState)
-      FS.mvdir(fs, '/r/dir1', '/r', '/invalid')
+      FS.mvdir(fs, { ...paths.file1, ...dests.root, ...names.invalid })
       assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
       assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
@@ -333,77 +359,77 @@ describe('FS', function () {
   describe('cpdir', function () {
     it('copy an existing directory with contents to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/dir1', '/r', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/copy-here'), dirContent)
+      FS.cpdir(fs, { ...paths.dir1, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), dirContent)
       assert.deepStrictEqual(
         [...fs.entries()],
         [
           ...fsState,
-          ['/r/copy-here', dirContent],
-          ['/r/copy-here/dir2', dirContent],
-          ['/r/copy-here/dir2/file3', fileContent]
+          ['/r/here', dirContent],
+          ['/r/here/dir3', dirContent],
+          ['/r/here/dir3/file3', fileContent]
         ]
       )
     })
 
     it('copy an existing directory without contents to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/dir2', '/r', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/copy-here'), dirContent)
+      FS.cpdir(fs, { ...paths.dir2, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), dirContent)
       assert.deepStrictEqual(
         [...fs.entries()],
         [
           ...fsState,
-          ['/r/copy-here', { type: 'dir' }]
+          ['/r/here', { type: 'dir' }]
         ]
       )
     })
 
     it('fail to copy an existing directory to a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/dir1', '/r/non-exist', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/non-exist/copy-here'), undefined)
+      FS.cpdir(fs, { ...paths.dir1, ...dests.nonExist, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/non-exist/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy a non-existing path to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/non-exist', '/r/dir1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
+      FS.cpdir(fs, { ...paths.nonExist, ...dests.dir1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing file to an existing file', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/file1', '/r/file2', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/file2/move-here'), undefined)
+      FS.cpdir(fs, { ...paths.file1, ...dests.file2, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file2/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing directory to an existing file', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/dir1', '/r/file1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/file1/move-here'), undefined)
+      FS.cpdir(fs, { ...paths.dir1, ...dests.file1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing file to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/file1', '/r/dir1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
+      FS.cpdir(fs, { ...paths.file1, ...dests.dir1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing directory to itself', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/dir1', '/r/dir1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/dir1/move-here'), undefined)
+      FS.cpdir(fs, { ...paths.dir1, ...dests.dir1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
-    it('fail to copy directory to invalid name', function () {
+    it('fail to copy directory to an invalid name', function () {
       fs = FS.create(fsState)
-      FS.cpdir(fs, '/r/dir1', '/r', '/invalid')
+      FS.cpdir(fs, { ...paths.dir1, ...dests.root, ...names.invalid })
       assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
       assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
@@ -413,43 +439,43 @@ describe('FS', function () {
   describe('mk', function () {
     it('make a file in an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mk(fs, '/r', 'make-here')
+      FS.mk(fs, { ...paths.root, ...names.here })
       const makeFileContent = { type: 'file', json: null }
-      assert.deepStrictEqual(fs.get('/r/make-here'), makeFileContent)
-      assert.deepStrictEqual([...fs.entries()], [...fsState, ['/r/make-here', makeFileContent]])
+      assert.deepStrictEqual(fs.get('/r/here'), makeFileContent)
+      assert.deepStrictEqual([...fs.entries()], [...fsState, ['/r/here', makeFileContent]])
     })
 
     it('fail to make file in an existing file', function () {
       fs = FS.create(fsState)
-      FS.mk(fs, '/r/file1', 'make-here')
-      assert.deepStrictEqual(fs.get('/r/file1/make-here'), undefined)
+      FS.mk(fs, { ...paths.file1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to make file in a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.mk(fs, '/r/non-exist', 'make-here')
-      assert.deepStrictEqual(fs.get('/r/non-exist/make-here'), undefined)
+      FS.mk(fs, { ...paths.nonExist, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/non-exist/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to overwrite an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mk(fs, '/r', 'dir1')
+      FS.mk(fs, { ...paths.root, ...names.dir1 })
       assert.deepStrictEqual(fs.get('/r/dir1'), dirContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to overwrite an existing file', function () {
       fs = FS.create(fsState)
-      FS.mk(fs, '/r', 'file1')
+      FS.mk(fs, { ...paths.root, ...names.file1 })
       assert.deepStrictEqual(fs.get('/r/file1'), fileContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to make file with invalid name', function () {
       fs = FS.create(fsState)
-      FS.mk(fs, '/r', '/invalid')
+      FS.mk(fs, { ...paths.root, ...names.invalid })
       assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
       assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
@@ -461,7 +487,7 @@ describe('FS', function () {
 
     it('write to an existing file', function () {
       fs = FS.create(fsState)
-      FS.write(fs, '/r/file1', writeFileContent.json)
+      FS.write(fs, { ...paths.file1, json: writeFileContent.json })
       assert.deepStrictEqual(fs.get('/r/file1'), writeFileContent)
       assert.deepStrictEqual(
         [...fs.entries()],
@@ -475,17 +501,17 @@ describe('FS', function () {
       )
     })
 
-    it('fail to write to a non-existing path', function () {
+    it('fail to write to a directory', function () {
       fs = FS.create(fsState)
-      FS.write(fs, '/r/non-exist', writeFileContent.content)
-      assert.deepStrictEqual(fs.get('/r/non-exist'), undefined)
+      FS.write(fs, { ...paths.dir1, json: writeFileContent.json })
+      assert.deepStrictEqual(fs.get('/r/dir1'), dirContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
-    it('fail to write to a directory', function () {
+    it('fail to write to a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.write(fs, '/r/dir1', writeFileContent.content)
-      assert.deepStrictEqual(fs.get('/r/dir1'), dirContent)
+      FS.write(fs, { ...paths.nonExist, json: writeFileContent.json })
+      assert.deepStrictEqual(fs.get('/r/non-exist'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
   })
@@ -493,7 +519,7 @@ describe('FS', function () {
   describe('rm', function () {
     it('remove an existing file', function () {
       fs = FS.create(fsState)
-      FS.rm(fs, '/r/file1')
+      FS.rm(fs, { ...paths.file1 })
       assert.deepStrictEqual(fs.get('/r/file1'), undefined)
       assert.deepStrictEqual(
         [...fs.entries()],
@@ -503,14 +529,14 @@ describe('FS', function () {
 
     it('fail to remove an existing directory', function () {
       fs = FS.create(fsState)
-      FS.rm(fs, '/r/dir1')
+      FS.rm(fs, { ...paths.dir1 })
       assert.deepStrictEqual(fs.get('/r/dir1'), dirContent)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to remove a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.rm(fs, '/r/non-exist')
+      FS.rm(fs, { ...paths.nonExist })
       assert.deepStrictEqual(fs.get('/r/non-exist'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
@@ -519,8 +545,8 @@ describe('FS', function () {
   describe('mv', function () {
     it('move an existing file to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/file1', '/r', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/move-here'), fileContent)
+      FS.mv(fs, { ...paths.file1, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), fileContent)
       assert.deepStrictEqual(
         [...fs.entries()],
         [
@@ -528,49 +554,49 @@ describe('FS', function () {
           ...fsState2,
           ...fsState4,
           ...fsState5,
-          ['/r/move-here', fileContent]
+          ['/r/here', fileContent]
         ]
       )
     })
 
     it('fail to move an existing file to a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/file1', '/r/non-exist', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/non-exist/move-here'), undefined)
+      FS.mv(fs, { ...paths.file1, ...dests.nonExist, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/non-exist/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move a non-existing path to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/non-exist', '/r', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/move-here'), undefined)
+      FS.mv(fs, { ...paths.nonExist, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move an existing file to an existing file', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/file1', '/r/file2', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/file2/move-here'), undefined)
+      FS.mv(fs, { ...paths.file1, ...dests.file2, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file2/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move an existing directory to an existing file', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/dir1', '/r/file1', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/file1/move-here'), undefined)
+      FS.mv(fs, { ...paths.dir1, ...dests.file1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move an existing directory to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/dir1', '/r/dir2', 'move-here')
-      assert.deepStrictEqual(fs.get('/r/dir2/move-here'), undefined)
+      FS.mv(fs, { ...paths.dir1, ...dests.dir2, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir2/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to move file to invalid name', function () {
       fs = FS.create(fsState)
-      FS.mv(fs, '/r/file1', '/r', '/invalid')
+      FS.mv(fs, { ...paths.file1, ...dests.root, ...names.invalid })
       assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
       assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
@@ -580,55 +606,55 @@ describe('FS', function () {
   describe('cp', function () {
     it('copy an existing file to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/file1', '/r', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/copy-here'), fileContent)
+      FS.cp(fs, { ...paths.file1, ...dests.root, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), fileContent)
       assert.deepStrictEqual(
         [...fs.entries()],
         [
           ...fsState,
-          ['/r/copy-here', fileContent]
+          ['/r/here', fileContent]
         ]
       )
     })
 
     it('fail to copy an existing file to a non-existing path', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/file1', '/r/non-exist', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/non-exist/copy-here'), undefined)
+      FS.cp(fs, { ...paths.file1, ...dests.nonExist, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/non-exist/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy a non-existing path to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/non-exist', '/r', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/copy-here'), undefined)
+      FS.cp(fs, { ...paths.nonExist, ...dests.dir1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing file to an existing file', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/file1', '/r/file2', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/file2/copy-here'), undefined)
+      FS.cp(fs, { ...paths.file1, ...dests.file2, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file2/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing directory to an existing file', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/dir1', '/r/file1', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/file1/copy-here'), undefined)
+      FS.cp(fs, { ...paths.dir1, ...dests.file1, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/file1/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy an existing directory to an existing directory', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/dir1', '/r/dir2', 'copy-here')
-      assert.deepStrictEqual(fs.get('/r/dir2/copy-here'), undefined)
+      FS.cp(fs, { ...paths.dir1, ...dests.dir2, ...names.here })
+      assert.deepStrictEqual(fs.get('/r/dir2/here'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)
     })
 
     it('fail to copy file to invalid name', function () {
       fs = FS.create(fsState)
-      FS.cp(fs, '/r/file1', '/r', '/invalid')
+      FS.cp(fs, { ...paths.file1, ...dests.root, ...names.invalid })
       assert.deepStrictEqual(fs.get('/r/invalid'), undefined)
       assert.deepStrictEqual(fs.get('/r//invalid'), undefined)
       assert.deepStrictEqual([...fs.entries()], fsState)

@@ -12,6 +12,48 @@ const errors = {
   pathExistYes: (path) => new Error(`path '${path}' already exists`)
 }
 
+const paramCheckKeys = {
+  path: 'path',
+  pathName: 'pathName',
+  pathDestName: 'pathDestName'
+}
+
+const paramChecks = (self) => ({
+  path: ({ path }) => {
+    if (!pathValid(path)) throw errors.pathValidNo(path)
+    if (!self.exists(path)) throw errors.pathExistNo(path)
+    return true
+  },
+  pathName: ({ path, name }) => {
+    if (!pathValid(path)) throw errors.pathValidNo(path)
+    if (!nameValid(name)) throw errors.nameValidNo(name)
+    if (!self.exists(path)) throw errors.pathExistNo(path)
+    if (self.exists(joinPath(path, name))) throw errors.pathExistYes(joinPath(path, name))
+    return true
+  },
+  pathDestName: ({ path, dest, name }) => {
+    if (!pathValid(path)) throw errors.pathValidNo(path)
+    if (!pathValid(dest)) throw errors.pathValidNo(dest)
+    if (!nameValid(name)) throw errors.nameValidNo(name)
+    if (!self.exists(path)) throw errors.pathExistNo(path)
+    if (!self.exists(dest)) throw errors.pathExistNo(dest)
+    if (self.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
+    return true
+  }
+})
+
+const paramKeys = {
+  [opcodes.MKDIR]: paramCheckKeys.pathName,
+  [opcodes.RMDIR]: paramCheckKeys.path,
+  [opcodes.MVDIR]: paramCheckKeys.pathDestName,
+  [opcodes.CPDIR]: paramCheckKeys.pathDestName,
+  [opcodes.MK]: paramCheckKeys.pathName,
+  [opcodes.WRITE]: paramCheckKeys.path,
+  [opcodes.RM]: paramCheckKeys.path,
+  [opcodes.MV]: paramCheckKeys.pathDestName,
+  [opcodes.CP]: paramCheckKeys.pathDestName
+}
+
 const type = 'fsstore'
 
 class FSStore extends Store {
@@ -26,82 +68,51 @@ class FSStore extends Store {
     this.read = (path = '') => fs.read(this._index.get(), path)
     this.tree = (path = '') => fs.tree(this._index.get(), path)
     this.ls = (path = '') => fs.ls(this._index.get(), path)
+
+    this.paramChecks = paramChecks(this)
   }
 
   static get type () { return type }
 
+  _addOp ({ op, ...payload }) {
+    this.paramChecks[paramKeys[op]](payload)
+    return this._addOperation({ op, ...payload })
+  }
+
   mkdir (path, name) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!nameValid(name)) throw errors.nameValidNo(name)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    if (this.exists(joinPath(path, name))) throw errors.pathExistYes(joinPath(path, name))
-    return this._addOperation({ op: opcodes.MKDIR, path, name })
+    return this._addOp({ op: opcodes.MKDIR, path, name })
   }
 
   rmdir (path) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    return this._addOperation({ op: opcodes.RMDIR, path })
+    return this._addOp({ op: opcodes.RMDIR, path })
   }
 
   mvdir (path, dest, name) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!pathValid(dest)) throw errors.pathValidNo(dest)
-    if (!nameValid(name)) throw errors.nameValidNo(name)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    if (!this.exists(dest)) throw errors.pathExistNo(dest)
-    if (this.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
-    return this._addOperation({ op: opcodes.MVDIR, path, dest, name })
+    return this._addOp({ op: opcodes.MVDIR, path, dest, name })
   }
 
   cpdir (path, dest, name) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!pathValid(dest)) throw errors.pathValidNo(dest)
-    if (!nameValid(name)) throw errors.nameValidNo(name)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    if (!this.exists(dest)) throw errors.pathExistNo(dest)
-    if (this.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
-    return this._addOperation({ op: opcodes.CPDIR, path, dest, name })
+    return this._addOp({ op: opcodes.CPDIR, path, dest, name })
   }
 
   mk (path, name) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!nameValid(name)) throw errors.nameValidNo(name)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    if (this.exists(joinPath(path, name))) throw errors.pathExistYes(joinPath(path, name))
-    return this._addOperation({ op: opcodes.MK, path, name })
+    return this._addOp({ op: opcodes.MK, path, name })
   }
 
   write (path, json) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    return this._addOperation({ op: opcodes.WRITE, path, json })
+    return this._addOp({ op: opcodes.WRITE, path, json })
   }
 
   rm (path) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    return this._addOperation({ op: opcodes.RM, path })
+    return this._addOp({ op: opcodes.RM, path })
   }
 
   mv (path, dest, name) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!pathValid(dest)) throw errors.pathValidNo(dest)
-    if (!nameValid(name)) throw errors.nameValidNo(name)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    if (!this.exists(dest)) throw errors.pathExistNo(dest)
-    if (this.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
-    return this._addOperation({ op: opcodes.MV, path, dest, name })
+    return this._addOp({ op: opcodes.MV, path, dest, name })
   }
 
   cp (path, dest, name) {
-    if (!pathValid(path)) throw errors.pathValidNo(path)
-    if (!pathValid(dest)) throw errors.pathValidNo(dest)
-    if (!nameValid(name)) throw errors.nameValidNo(name)
-    if (!this.exists(path)) throw errors.pathExistNo(path)
-    if (!this.exists(dest)) throw errors.pathExistNo(dest)
-    if (this.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
-    return this._addOperation({ op: opcodes.CP, path, dest, name })
+    return this._addOp({ op: opcodes.CP, path, dest, name })
   }
 }
 

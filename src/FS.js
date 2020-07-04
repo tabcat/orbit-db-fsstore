@@ -13,6 +13,9 @@ const opcodes = {
   CP: 'CP'
 }
 
+const lowercase = Object.keys(opcodes)
+  .reduce((a, k) => ({ ...a, [k]: opcodes[k].toLowerCase() }), {})
+
 // content types
 const cTypes = {
   dir: 'dir',
@@ -53,7 +56,7 @@ function ls (fs, path) {
 }
 
 // make directory at path + name
-function mkdir (fs, path, name) {
+function mkdir (fs, { path, name }) {
   if (
     nameValid(name) &&
     fs.has(path) && !fs.has(joinPath(path, name)) &&
@@ -64,7 +67,7 @@ function mkdir (fs, path, name) {
 }
 
 // remove directory at path
-function rmdir (fs, path) {
+function rmdir (fs, { path }) {
   if (fs.has(path) && fs.get(path).type === cTypes.dir) {
     const paths = [path, ...tree(fs, path)]
     for (const p of paths) {
@@ -74,7 +77,7 @@ function rmdir (fs, path) {
 }
 
 // move directory at path to destination path + name
-function mvdir (fs, path, dest, name) {
+function mvdir (fs, { path, dest, name }) {
   if (
     nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
@@ -91,7 +94,7 @@ function mvdir (fs, path, dest, name) {
 }
 
 // copy directory at path to destination path + name
-function cpdir (fs, path, dest, name) {
+function cpdir (fs, { path, dest, name }) {
   if (
     nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
@@ -107,7 +110,7 @@ function cpdir (fs, path, dest, name) {
 }
 
 // make file at path + name
-function mk (fs, path, name) {
+function mk (fs, { path, name }) {
   if (
     nameValid(name) &&
     fs.has(path) && !fs.has(joinPath(path, name)) &&
@@ -118,21 +121,21 @@ function mk (fs, path, name) {
 }
 
 // write json data to path
-function write (fs, path, json) {
+function write (fs, { path, json }) {
   if (fs.has(path) && fs.get(path).type === cTypes.file) {
     fs.set(path, { type: cTypes.file, json })
   }
 }
 
 // remove file at path
-function rm (fs, path) {
+function rm (fs, { path }) {
   if (fs.has(path) && fs.get(path).type === cTypes.file) {
     fs.delete(path)
   }
 }
 
 // move file at path to destination path + name
-function mv (fs, path, dest, name) {
+function mv (fs, { path, dest, name }) {
   if (
     nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
@@ -144,7 +147,7 @@ function mv (fs, path, dest, name) {
 }
 
 // copy file at path to destination path + name
-function cp (fs, path, dest, name) {
+function cp (fs, { path, dest, name }) {
   if (
     nameValid(name) &&
     fs.has(path) && fs.has(dest) && !fs.has(joinPath(dest, name)) &&
@@ -171,6 +174,7 @@ module.exports = {
   mv,
   cp,
   opcodes,
+  lowercase,
   cTypes,
   pathValid,
   nameValid,
