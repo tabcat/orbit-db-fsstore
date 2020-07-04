@@ -10,7 +10,8 @@ const opcodes = {
   WRITE: 'WRITE',
   RM: 'RM',
   MV: 'MV',
-  CP: 'CP'
+  CP: 'CP',
+  BATCH: 'BATCH'
 }
 
 const lowercase = Object.keys(opcodes)
@@ -157,13 +158,15 @@ function cp (fs, { path, dest, name }) {
   }
 }
 
-module.exports = {
-  create,
-  exists,
-  content,
-  read,
-  tree,
-  ls,
+function batch (fs, { payloads }) {
+  if (Array.isArray(payloads)) {
+    for (const payload of payloads) {
+      if (opcodes[payload.op]) ops[lowercase[payload.op]](fs, payload)
+    }
+  }
+}
+
+const ops = {
   mkdir,
   rmdir,
   mvdir,
@@ -173,6 +176,17 @@ module.exports = {
   rm,
   mv,
   cp,
+  batch
+}
+
+module.exports = {
+  ops,
+  create,
+  exists,
+  content,
+  read,
+  tree,
+  ls,
   opcodes,
   lowercase,
   cTypes,

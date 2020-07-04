@@ -148,6 +148,21 @@ Object.keys(testAPIs).forEach(API => {
         await db.cp('/r/file1', '/r', 'file2')
         assert.strict.deepEqual(db.ls('/r'), ['/r/file1', '/r/file2'])
       })
+
+      it('.batch combine multiple operations', async function () {
+        const batch = db.batch()
+        batch.mkdir('/r', 'dir1')
+        batch.mk('/r/dir1', 'file1')
+        batch.mkdir('/r', 'dir2')
+        batch.mk('/r/dir2', 'file2')
+        batch.write('/r/dir1/file1', true)
+        await batch.execute()
+        assert.strict.deepEqual(
+          db.tree('/r'),
+          ['/r/dir1', '/r/dir1/file1', '/r/dir2', '/r/dir2/file2']
+        )
+        assert.strict.equal(db.read('/r/dir1/file1'), true)
+      })
     })
   })
 })

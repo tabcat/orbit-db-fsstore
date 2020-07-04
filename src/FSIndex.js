@@ -6,7 +6,7 @@ const { opcodes, lowercase } = FS
 
 const fsReducer = (fs) => ({ payload } = {}) => {
   try {
-    if (opcodes[payload.op]) FS[lowercase[payload.op]](fs, payload)
+    if (opcodes[payload.op]) FS.ops[lowercase[payload.op]](fs, payload)
   } catch (e) {
     console.log(e)
   }

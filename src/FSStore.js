@@ -15,7 +15,8 @@ const errors = {
 const paramCheckKeys = {
   path: 'path',
   pathName: 'pathName',
-  pathDestName: 'pathDestName'
+  pathDestName: 'pathDestName',
+  payloads: 'payloads'
 }
 
 const paramChecks = (self) => ({
@@ -39,7 +40,8 @@ const paramChecks = (self) => ({
     if (!self.exists(dest)) throw errors.pathExistNo(dest)
     if (self.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
     return true
-  }
+  },
+  payloads: ({ payloads }) => Array.isArray(payloads)
 })
 
 const paramKeys = {
@@ -51,7 +53,8 @@ const paramKeys = {
   [opcodes.WRITE]: paramCheckKeys.path,
   [opcodes.RM]: paramCheckKeys.path,
   [opcodes.MV]: paramCheckKeys.pathDestName,
-  [opcodes.CP]: paramCheckKeys.pathDestName
+  [opcodes.CP]: paramCheckKeys.pathDestName,
+  [opcodes.BATCH]: paramCheckKeys.payloads
 }
 
 const type = 'fsstore'
@@ -113,6 +116,24 @@ class FSStore extends Store {
 
   cp (path, dest, name) {
     return this._addOp({ op: opcodes.CP, path, dest, name })
+  }
+
+  batch () {
+    const pls = []
+    const makeBatchOp = (payloads) => this._addOp({ op: opcodes.BATCH, payloads })
+
+    return {
+      mkdir: (...p) => pls.push({ op: opcodes.MKDIR, path: p[0], name: p[1] }),
+      rmdir: (...p) => pls.push({ op: opcodes.RMDIR, path: p[0] }),
+      mvdir: (...p) => pls.push({ op: opcodes.MVDIR, path: p[0], dest: p[1], name: p[2] }),
+      cpdir: (...p) => pls.push({ op: opcodes.CPDIR, path: p[0], dest: p[1], name: p[2] }),
+      mk: (...p) => pls.push({ op: opcodes.MK, path: p[0], name: p[1] }),
+      write: (...p) => pls.push({ op: opcodes.WRITE, path: p[0], json: p[1] }),
+      rm: (...p) => pls.push({ op: opcodes.RM, path: p[0] }),
+      mv: (...p) => pls.push({ op: opcodes.MV, path: p[0], dest: p[1], name: p[2] }),
+      cp: (...p) => pls.push({ op: opcodes.CP, path: p[0], dest: p[1], name: p[2] }),
+      execute: () => makeBatchOp(pls)
+    }
   }
 }
 
