@@ -141,7 +141,7 @@ class FSStore extends Store {
   }
 }
 
-FSStore.prototype.FS = FS
-FSStore.prototype.FSIndex = FSIndex
+FSStore.FS = FS
+FSStore.FSIndex = FSIndex
 
 module.exports = FSStore
