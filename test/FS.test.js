@@ -155,7 +155,9 @@ describe('FS', function () {
 
     it('join path with invalid names throws', function () {
       assert.throws(() => FS.joinPath('/r', '/file1'))
-      assert.throws(() => FS.joinPath('/r', 'dir1', 'file1/'))
+      assert.throws(() => FS.joinPath('/r', 'file1/'))
+      assert.throws(() => FS.joinPath('/r', '/file1/'))
+      assert.throws(() => FS.joinPath('/r', 'fi/le1'))
     })
   })
 

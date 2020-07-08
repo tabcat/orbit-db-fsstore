@@ -36,9 +36,10 @@ const pathValid = (path) => typeof path === 'string' && pathPattern.test(path)
 const namePattern = /^[^/]+$/
 const nameValid = (name) => typeof name === 'string' && namePattern.test(name)
 
-function joinPath (path, ...names) {
-  if (!names.every(nameValid)) throw new Error('invalid name supplied')
-  return `${path}/${names.join('/')}`
+function joinPath (path, name) {
+  if (!pathValid(path)) throw errors.pathValidNo(path)
+  if (!nameValid(name)) throw errors.nameValidNo(name)
+  return `${path}/${name}`
 }
 
 function tree (fs, path) {
