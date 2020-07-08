@@ -3,14 +3,8 @@
 
 const Store = require('orbit-db-store')
 const FSIndex = require('./FSIndex')
-const { joinPath, pathValid, nameValid, opcodes, ...fs } = require('./FS')
-
-const errors = {
-  pathValidNo: (path) => new Error(`path ${path} is not valid`),
-  nameValidNo: (name) => new Error(`name ${name} is not valid`),
-  pathExistNo: (path) => new Error(`path '${path}' does not exist`),
-  pathExistYes: (path) => new Error(`path '${path}' already exists`)
-}
+const FS = require('./FS')
+const { joinPath, pathValid, nameValid, opcodes, errors, ...fs } = FS
 
 const paramCheckKeys = {
   path: 'path',
