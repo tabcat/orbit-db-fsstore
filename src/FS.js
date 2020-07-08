@@ -176,7 +176,9 @@ const errors = {
   pathValidNo: (path) => new Error(`path ${path} is not valid`),
   nameValidNo: (name) => new Error(`name ${name} is not valid`),
   pathExistNo: (path) => new Error(`path '${path}' does not exist`),
-  pathExistYes: (path) => new Error(`path '${path}' already exists`)
+  pathExistYes: (path) => new Error(`path '${path}' already exists`),
+  pathDirNo: (path) => new Error(`path '${path}' is not a dir`),
+  pathFileNo: (path) => new Error(`path '${path}' is not a file`)
 }
 
 const ops = {

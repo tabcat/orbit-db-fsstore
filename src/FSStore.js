@@ -13,26 +13,34 @@ const paramCheckKeys = {
   payloads: 'payloads'
 }
 
+const cTypeError = (cType) => cType === fs.cTypes.dir
+  ? errors.pathDirNo
+  : errors.pathFileNo
+
 const paramChecks = (self) => ({
-  path: ({ path }) => {
+  path: ({ path }, cType) => {
     if (!pathValid(path)) throw errors.pathValidNo(path)
     if (!self.exists(path)) throw errors.pathExistNo(path)
+    if (self.content(path) !== cType) throw cTypeError(cType)(path)
     return true
   },
-  pathName: ({ path, name }) => {
+  pathName: ({ path, name }, cType) => {
     if (!pathValid(path)) throw errors.pathValidNo(path)
     if (!nameValid(name)) throw errors.nameValidNo(name)
     if (!self.exists(path)) throw errors.pathExistNo(path)
     if (self.exists(joinPath(path, name))) throw errors.pathExistYes(joinPath(path, name))
+    if (self.content(path) !== fs.cTypes.dir) throw errors.pathDirNo(path)
     return true
   },
-  pathDestName: ({ path, dest, name }) => {
+  pathDestName: ({ path, dest, name }, cType) => {
     if (!pathValid(path)) throw errors.pathValidNo(path)
     if (!pathValid(dest)) throw errors.pathValidNo(dest)
     if (!nameValid(name)) throw errors.nameValidNo(name)
     if (!self.exists(path)) throw errors.pathExistNo(path)
     if (!self.exists(dest)) throw errors.pathExistNo(dest)
     if (self.exists(joinPath(dest, name))) throw errors.pathExistYes(joinPath(dest, name))
+    if (self.content(path) !== cType) throw cTypeError(cType)(path)
+    if (self.content(dest) !== fs.cTypes.dir) throw errors.pathDirNo(dest)
     return true
   },
   payloads: ({ payloads }) => Array.isArray(payloads)
@@ -73,7 +81,8 @@ class FSStore extends Store {
   static get type () { return type }
 
   _addOp ({ op, ...payload }) {
-    this.paramChecks[paramKeys[op]](payload)
+    const cType = op.slice(-3) === 'DIR' ? fs.cTypes.dir : fs.cTypes.file
+    this.paramChecks[paramKeys[op]](payload, cType)
     return this._addOperation({ op, ...payload })
   }
 
