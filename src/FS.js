@@ -42,6 +42,11 @@ function joinPath (path, name) {
   return `${path}/${name}`
 }
 
+function pathName (path) {
+  if (!pathValid(path)) throw errors.pathValidNo(path)
+  return path.split('/')[path.split('/').length - 1]
+}
+
 function tree (fs, path) {
   const a = []
   for (const p of fs.keys()) {
@@ -201,5 +206,6 @@ module.exports = {
   cTypes,
   pathValid,
   nameValid,
-  joinPath
+  joinPath,
+  pathName
 }
