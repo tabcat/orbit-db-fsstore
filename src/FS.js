@@ -52,19 +52,23 @@ function pathName (path) {
   return path.split('/')[path.split('/').length - 1]
 }
 
+const isOver = (p1, p2) => `${p1}/` === p2.slice(0, p1.length + 1)
+const isOneHigher = (p1, p2) => p1.split('/').length + 1 === p2.split('/').length
+
 function tree (fs, path) {
   const a = []
   for (const p of fs.keys()) {
-    if (`${path}/` === p.slice(0, path.length + 1)) {
-      a.push(p)
-    }
+    if (isOver(path, p)) a.push(p)
   }
   return a.sort((o, t) => o.toLowerCase().localeCompare(t.toLowerCase()))
 }
 
 function ls (fs, path) {
-  return tree(fs, path)
-    .filter(p => path.split('/').length + 1 === p.split('/').length)
+  const a = []
+  for (const p of fs.keys()) {
+    if (isOver(path, p) && isOneHigher(path, p)) a.push(p)
+  }
+  return a.sort((o, t) => o.toLowerCase().localeCompare(t.toLowerCase()))
 }
 
 // make directory at path + name
