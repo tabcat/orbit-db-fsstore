@@ -54,7 +54,7 @@ function tree (fs, path) {
       a.push(p)
     }
   }
-  return a
+  return a.sort((o, t) => o.toLowerCase().localeCompare(t.toLowerCase()))
 }
 
 function ls (fs, path) {

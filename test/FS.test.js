@@ -3,6 +3,7 @@
 const assert = require('assert')
 const FS = require('../src/FS')
 const { opcodes } = FS
+const sortFn = (o, t) => o.toLowerCase().localeCompare(t.toLowerCase())
 
 describe('FS', function () {
   const dirContent = { type: 'dir' }
@@ -177,9 +178,9 @@ describe('FS', function () {
     it('tree an existing directory with contents', function () {
       fs = FS.create(fsState)
       let tree
-      tree = fsState.slice(1).map(x => x[0])
+      tree = fsState.slice(1).map(x => x[0]).sort(sortFn)
       assert.deepStrictEqual(FS.tree(fs, '/r'), tree)
-      tree = fsState5.map(x => x[0])
+      tree = fsState5.map(x => x[0]).sort(sortFn)
       assert.deepStrictEqual(FS.tree(fs, '/r/dir1'), tree)
     })
 
@@ -193,7 +194,7 @@ describe('FS', function () {
   describe('ls', function () {
     it('ls an existing directory with contents', function () {
       fs = FS.create(fsState)
-      const ls = [fsState5[0]].map(x => x[0])
+      const ls = [fsState5[0]].map(x => x[0]).sort(sortFn)
       assert.deepStrictEqual(FS.ls(fs, '/r/dir1'), ls)
     })
 
