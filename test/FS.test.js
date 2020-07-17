@@ -56,6 +56,12 @@ describe('FS', function () {
   }
   let fs
 
+  it('exposes root path', function () {
+    fs = FS.create()
+    assert.strict.equal(fs.root, '/r')
+    assert.strict.equal(FS.root(fs), '/r')
+  })
+
   it('create an empty filesystem', function () {
     fs = FS.create()
     assert.deepStrictEqual([...fs.entries()], fsState1)

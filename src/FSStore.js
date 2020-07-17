@@ -80,6 +80,8 @@ class FSStore extends Store {
 
   static get type () { return type }
 
+  get root () { return fs.root(this.index) }
+
   _addOp ({ op, ...payload }) {
     const cType = op.slice(-3) === 'DIR' ? fs.cTypes.dir : fs.cTypes.file
     this.paramChecks[paramKeys[op]](payload, cType)

@@ -64,6 +64,10 @@ Object.keys(testAPIs).forEach(API => {
         await db.drop()
       })
 
+      it('.root expose root path', async function () {
+        assert.strict.equal(db.root, '/r')
+      })
+
       it('.joinPath join a path and name', async function () {
         const path = '/r/dir1'
         const name = 'asdf'
