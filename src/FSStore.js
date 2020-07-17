@@ -69,11 +69,11 @@ class FSStore extends Store {
 
     this.joinPath = joinPath
     this.pathName = pathName
-    this.exists = (path = '') => fs.exists(this._index.get(), path)
-    this.content = (path = '') => fs.content(this._index.get(), path)
-    this.read = (path = '') => fs.read(this._index.get(), path)
-    this.tree = (path = '') => fs.tree(this._index.get(), path)
-    this.ls = (path = '') => fs.ls(this._index.get(), path)
+    this.exists = (path = '') => fs.exists(this.index, path)
+    this.content = (path = '') => fs.content(this.index, path)
+    this.read = (path = '') => fs.read(this.index, path)
+    this.tree = (path = '') => fs.tree(this.index, path)
+    this.ls = (path = '') => fs.ls(this.index, path)
 
     this.paramChecks = paramChecks(this)
   }
