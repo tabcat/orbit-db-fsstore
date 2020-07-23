@@ -3,29 +3,40 @@
 
 const FS = require('./FS')
 const { opcodes, lowercase } = FS
+const { ab2str } = require('./util')
 
-const fsReducer = (fs) => ({ payload } = {}) => {
+const fsReducer = (crypter) => async (fs, { payload } = {}) => {
   try {
+    fs = await fs
+    if (crypter) {
+      const { bytes } = await crypter.decrypt(
+        Uint8Array.from(payload.bytes),
+        Uint8Array.from(payload.iv)
+      )
+      payload = JSON.parse(ab2str(bytes))
+    }
     if (opcodes[payload.op]) FS.ops[lowercase[payload.op]](fs, payload)
   } catch (e) {
     console.log(e)
   }
+  return fs
 }
 
-class FSIndex {
-  constructor () {
-    this._index = FS.create()
+const passOptionsToIndex = (options = {}) =>
+  class FSIndex {
+    constructor () {
+      this._index = FS.create()
+    }
+
+    get () {
+      return this._index
+    }
+
+    async updateIndex (oplog) {
+      const fs = FS.create()
+      await oplog.values.reduce(fsReducer(options.crypter), fs)
+      this._index = fs
+    }
   }
 
-  get () {
-    return this._index
-  }
-
-  updateIndex (oplog) {
-    const fs = FS.create()
-    oplog.values.map(fsReducer(fs))
-    this._index = fs
-  }
-}
-
-module.exports = FSIndex
+module.exports = passOptionsToIndex

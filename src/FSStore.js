@@ -5,6 +5,7 @@ const Store = require('orbit-db-store')
 const FSIndex = require('./FSIndex')
 const FS = require('./FS')
 const { joinPath, pathName, pathValid, nameValid, opcodes, errors, ...fs } = FS
+const { str2ab } = require('./util')
 
 const paramCheckKeys = {
   path: 'path',
@@ -62,8 +63,8 @@ const paramKeys = {
 const type = 'fsstore'
 
 class FSStore extends Store {
-  constructor (ipfs, identity, dbname, options) {
-    options = Object.assign({}, options, { Index: FSIndex })
+  constructor (ipfs, identity, dbname, options = {}) {
+    options = Object.assign({}, options, { Index: FSIndex(options) })
     super(ipfs, identity, dbname, options)
     this._type = FSStore.type
 
@@ -76,16 +77,24 @@ class FSStore extends Store {
     this.ls = (path = '') => fs.ls(this.index, path)
 
     this.paramChecks = paramChecks(this)
+
+    this.crypter = options.crypter
   }
 
   static get type () { return type }
 
   get root () { return fs.root(this.index) }
 
-  _addOp ({ op, ...payload }) {
+  async _addOp ({ op, ...params }) {
     const cType = op.slice(-3) === 'DIR' ? fs.cTypes.dir : fs.cTypes.file
-    this.paramChecks[paramKeys[op]](payload, cType)
-    return this._addOperation({ op, ...payload })
+    this.paramChecks[paramKeys[op]](params, cType)
+    let payload = { op, ...params }
+    if (this.crypter) {
+      const serializedPayload = str2ab(JSON.stringify(payload))
+      const { bytes, iv } = await this.crypter.encrypt(serializedPayload)
+      payload = { bytes: Array.from(bytes), iv: Array.from(iv) }
+    }
+    return this._addOperation(payload)
   }
 
   mkdir (path, name) {
