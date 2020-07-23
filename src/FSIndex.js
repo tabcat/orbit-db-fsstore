@@ -28,10 +28,6 @@ const passOptionsToIndex = (options = {}) =>
       this._index = FS.create()
     }
 
-    get () {
-      return this._index
-    }
-
     async updateIndex (oplog) {
       const fs = FS.create()
       await oplog.values.reduce(fsReducer(options.crypter), fs)
