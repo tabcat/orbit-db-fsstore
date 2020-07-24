@@ -29,10 +29,12 @@
   },
   "homepage": "https://github.com/tabcat/orbit-db-fsstore#readme",
   "devDependencies": {
+    "@tabcat/aes-gcm-crypter": "^1.0.1",
     "cross-env": "^7.0.2",
     "mocha": "^7.1.2",
     "orbit-db": "^0.23.1",
     "orbit-db-test-utils": "^0.9.3",
     "rimraf": "^3.0.2"
-  }
+  },
+  "dependencies": {}
 }
