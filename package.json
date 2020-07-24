@@ -33,8 +33,8 @@
     "cross-env": "^7.0.2",
     "mocha": "^7.1.2",
     "orbit-db": "^0.23.1",
+    "orbit-db-store": "^3.3.0",
     "orbit-db-test-utils": "^0.9.3",
     "rimraf": "^3.0.2"
-  },
-  "dependencies": {}
+  }
 }
