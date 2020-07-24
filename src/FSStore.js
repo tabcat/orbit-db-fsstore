@@ -6,6 +6,7 @@ const FSIndex = require('./FSIndex')
 const FS = require('./FS')
 const { joinPath, pathName, pathValid, nameValid, opcodes, errors, ...fs } = FS
 const { str2ab } = require('./util')
+const b64 = require('base64-js')
 
 const paramCheckKeys = {
   path: 'path',
@@ -93,8 +94,8 @@ class FSStore extends Store {
       const serializedPayload = str2ab(JSON.stringify(payload))
       const { cipherbytes, iv } = await this.crypter.encrypt(serializedPayload)
       payload = {
-        cipherbytes: Array.from(new Uint8Array(cipherbytes)),
-        iv: Array.from(iv)
+        cipherbytes: b64.fromByteArray(new Uint8Array(cipherbytes)),
+        iv: b64.fromByteArray(iv)
       }
     }
     return this._addOperation(payload)

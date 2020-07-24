@@ -4,14 +4,15 @@
 const FS = require('./FS')
 const { opcodes, lowercase } = FS
 const { ab2str } = require('./util')
+const b64 = require('base64-js')
 
 const fsReducer = (crypter) => async (fs, { payload } = {}) => {
   try {
     fs = await fs
     if (crypter) {
       const bytes = await crypter.decrypt(
-        Uint8Array.from(payload.cipherbytes).buffer,
-        Uint8Array.from(payload.iv)
+        b64.toByteArray(payload.cipherbytes).buffer,
+        b64.toByteArray(payload.iv)
       )
       payload = JSON.parse(ab2str(bytes))
     }
