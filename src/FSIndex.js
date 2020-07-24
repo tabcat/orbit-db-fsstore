@@ -9,8 +9,8 @@ const fsReducer = (crypter) => async (fs, { payload } = {}) => {
   try {
     fs = await fs
     if (crypter) {
-      const { bytes } = await crypter.decrypt(
-        Uint8Array.from(payload.bytes),
+      const bytes = await crypter.decrypt(
+        Uint8Array.from(payload.cipherbytes).buffer,
         Uint8Array.from(payload.iv)
       )
       payload = JSON.parse(ab2str(bytes))

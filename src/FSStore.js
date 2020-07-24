@@ -91,8 +91,11 @@ class FSStore extends Store {
     let payload = { op, ...params }
     if (this.crypter) {
       const serializedPayload = str2ab(JSON.stringify(payload))
-      const { bytes, iv } = await this.crypter.encrypt(serializedPayload)
-      payload = { bytes: Array.from(bytes), iv: Array.from(iv) }
+      const { cipherbytes, iv } = await this.crypter.encrypt(serializedPayload)
+      payload = {
+        cipherbytes: Array.from(new Uint8Array(cipherbytes)),
+        iv: Array.from(iv)
+      }
     }
     return this._addOperation(payload)
   }
