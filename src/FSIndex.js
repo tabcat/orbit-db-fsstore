@@ -10,7 +10,7 @@ const fsReducer = (crypter) => async (fs, { payload } = {}) => {
   fs = await fs
   try {
     const fsCopy = new Map(fs)
-    if (crypter) {
+    if (crypter && payload.cipherbytes && payload.iv) {
       const bytes = await crypter.decrypt(
         b64.toByteArray(payload.cipherbytes).buffer,
         b64.toByteArray(payload.iv)
