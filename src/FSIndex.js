@@ -23,17 +23,17 @@ const fsReducer = (crypter) => async (fs, { payload } = {}) => {
   return fs
 }
 
-const passOptionsToIndex = (options = {}) =>
-  class FSIndex {
-    constructor () {
-      this._index = FS.create()
-    }
-
-    async updateIndex (oplog) {
-      const fs = FS.create()
-      await oplog.values.reduce(fsReducer(options.crypter), fs)
-      this._index = fs
-    }
+class FSIndex {
+  constructor () {
+    this._index = FS.create()
+    this._crypter = null
   }
 
-module.exports = passOptionsToIndex
+  async updateIndex (oplog) {
+    const fs = FS.create()
+    await oplog.values.reduce(fsReducer(this.crypter), fs)
+    this._index = fs
+  }
+}
+
+module.exports = FSIndex

@@ -65,7 +65,7 @@ const type = 'fsstore'
 
 class FSStore extends Store {
   constructor (ipfs, identity, dbname, options = {}) {
-    options = Object.assign({}, options, { Index: FSIndex(options) })
+    options = Object.assign({}, options, { Index: FSIndex })
     super(ipfs, identity, dbname, options)
     this._type = FSStore.type
 
@@ -79,7 +79,12 @@ class FSStore extends Store {
 
     this.paramChecks = paramChecks(this)
 
-    this.crypter = options.crypter
+    this._crypter = null
+    this.setCrypter = (crypter) => {
+      this._crypter = crypter
+      this._index._crypter = crypter
+    }
+    if (options.crypter) this.setCrypter(options.crypter)
   }
 
   static get type () { return type }
