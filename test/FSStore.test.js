@@ -68,6 +68,8 @@ Object.keys(testAPIs).forEach(API => {
 
       it('.root expose root path', async function () {
         assert.strict.equal(db.root, '/r')
+        await db.mk('/r', 'file1')
+        assert.strict.equal(db.root, '/r')
       })
 
       it('.joinPath join a path and name', async function () {
@@ -188,6 +190,8 @@ Object.keys(testAPIs).forEach(API => {
       })
 
       it('.root expose root path', async function () {
+        assert.strict.equal(db.root, '/r')
+        await db.mk('/r', 'file1')
         assert.strict.equal(db.root, '/r')
       })
 

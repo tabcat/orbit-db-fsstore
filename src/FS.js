@@ -25,9 +25,9 @@ const cTypes = {
 
 // creates an fs with a root dir
 const defaultRoot = '/r'
-const setRoot = (fs) => {
-  fs.root = defaultRoot
-  return fs.set(defaultRoot, { type: cTypes.dir })
+const setRoot = (fs, root = defaultRoot) => {
+  fs.root = root
+  return fs.set(root, { type: cTypes.dir })
 }
 const root = (fs) => fs.root
 const create = (state) => setRoot(new Map(state))
@@ -207,6 +207,7 @@ const ops = {
 module.exports = {
   errors,
   ops,
+  setRoot,
   root,
   create,
   exists,
