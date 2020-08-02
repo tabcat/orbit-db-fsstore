@@ -10,14 +10,18 @@ const fsReducer = (crypter) => async (fs, { payload } = {}) => {
   fs = await fs
   try {
     const fsCopy = new Map(fs)
-    if (crypter && payload.cipherbytes && payload.iv) {
-      const bytes = await crypter.decrypt(
-        b64.toByteArray(payload.cipherbytes).buffer,
-        b64.toByteArray(payload.iv)
-      )
-      payload = JSON.parse(ab2str(bytes))
+    if (crypter) {
+      if (payload.cipherbytes && payload.iv) {
+        const bytes = await crypter.decrypt(
+          b64.toByteArray(payload.cipherbytes).buffer,
+          b64.toByteArray(payload.iv)
+        )
+        payload = JSON.parse(ab2str(bytes))
+        if (opcodes[payload.op]) FS.ops[lowercase[payload.op]](fsCopy, payload)
+      }
+    } else {
+      if (opcodes[payload.op]) FS.ops[lowercase[payload.op]](fsCopy, payload)
     }
-    if (opcodes[payload.op]) FS.ops[lowercase[payload.op]](fsCopy, payload)
     fs = fsCopy
   } catch (e) {
     console.log(e)
