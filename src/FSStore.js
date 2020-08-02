@@ -95,9 +95,9 @@ class FSStore extends Store {
     const cType = op.slice(-3) === 'DIR' ? fs.cTypes.dir : fs.cTypes.file
     this.paramChecks[paramKeys[op]](params, cType)
     let payload = { op, ...params }
-    if (this.crypter) {
+    if (this._crypter) {
       const serializedPayload = str2ab(JSON.stringify(payload))
-      const { cipherbytes, iv } = await this.crypter.encrypt(serializedPayload)
+      const { cipherbytes, iv } = await this._crypter.encrypt(serializedPayload)
       payload = {
         cipherbytes: b64.fromByteArray(new Uint8Array(cipherbytes)),
         iv: b64.fromByteArray(iv)

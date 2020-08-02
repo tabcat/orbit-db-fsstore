@@ -33,7 +33,7 @@ class FSIndex {
 
   async updateIndex (oplog) {
     const fs = FS.create()
-    this._index = await oplog.values.reduce(fsReducer(this.crypter), fs)
+    this._index = await oplog.values.reduce(fsReducer(this._crypter), fs)
     setRoot(this._index, fs.root)
   }
 }
