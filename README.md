@@ -11,6 +11,8 @@ an orbit-db store representing a file system
 npm install @tabcat/orbit-db-fsstore
 ```
 
+##### Credit [File system on CRDT; Mehdi Ahmed-Nacer, Stéphane Martin, Pascal Urso](https://arxiv.org/pdf/1207.5990.pdf) for filesystem datatype and operation structure
+
 ## FSStore Instance Methods API
 *check out [./test](./test) for more info*
 ### .joinPath(path, name)
