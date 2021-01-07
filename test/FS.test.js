@@ -180,6 +180,18 @@ describe('FS', function () {
     })
   })
 
+  describe('baseName', function () {
+    it('get path parent of path', function () {
+      assert.strict.equal(FS.baseName('/r/file1'), '/r')
+    })
+
+    it('base name invalid path throws', function () {
+      assert.throws(() => FS.baseName('/r/file1/'))
+      assert.throws(() => FS.baseName('r/file1/'))
+      assert.throws(() => FS.baseName('r/file1'))
+    })
+  })
+
   describe('tree', function () {
     it('tree an existing directory with contents', function () {
       fs = FS.create(fsState)
