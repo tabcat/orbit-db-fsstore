@@ -78,6 +78,17 @@ Object.keys(testAPIs).forEach(API => {
         assert.strict.equal(db.joinPath(path, name), `${path}/${name}`)
       })
 
+      it('.pathName get path name', async function () {
+        const path = '/r/dir1/asdf'
+        const name = 'asdf'
+        assert.strict.equal(db.pathName(path), name)
+      })
+
+      it('.baseName get path parent of path', async function () {
+        const path = '/r/dir1/asdf'
+        assert.strict.equal(db.baseName(path), '/r/dir1')
+      })
+
       it('.exists check whether a path exists', async function () {
         assert.strict.equal(db.exists(''), false)
         assert.strict.equal(db.exists('/r'), true)
