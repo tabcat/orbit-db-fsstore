@@ -4,7 +4,7 @@
 const Store = require('orbit-db-store')
 const FSIndex = require('./FSIndex')
 const FS = require('./FS')
-const { joinPath, pathName, pathValid, nameValid, opcodes, errors, ...fs } = FS
+const { joinPath, pathName, baseName, pathValid, nameValid, opcodes, errors, ...fs } = FS
 const { str2ab } = require('./util')
 const b64 = require('base64-js')
 
@@ -71,6 +71,7 @@ class FSStore extends Store {
 
     this.joinPath = joinPath
     this.pathName = pathName
+    this.baseName = baseName
     this.exists = (path = '') => fs.exists(this.index, path)
     this.content = (path = '') => fs.content(this.index, path)
     this.read = (path = '') => fs.read(this.index, path)
