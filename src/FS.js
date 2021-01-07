@@ -52,7 +52,12 @@ function joinPath (path, name) {
 
 function pathName (path) {
   if (!pathValid(path)) throw errors.pathValidNo(path)
-  return path.split('/')[path.split('/').length - 1]
+  return path.slice(path.lastIndexOf('/') + 1)
+}
+
+function baseName (path) {
+  if (!pathValid(path)) throw errors.pathValidNo(path)
+  return path.slice(0, Math.max(path.lastIndexOf('/'), 0))
 }
 
 const isOver = (p1, p2) => `${p1}/` === p2.slice(0, p1.length + 1)
@@ -224,5 +229,6 @@ module.exports = {
   pathValid,
   nameValid,
   joinPath,
-  pathName
+  pathName,
+  baseName
 }
