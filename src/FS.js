@@ -36,10 +36,13 @@ const exists = (fs, path) => fs.has(path)
 const content = (fs, path) => fs.get(path) && fs.get(path).type
 const read = (fs, path) => fs.get(path) && fs.get(path).json
 
-const pathPattern = /^(?:\/[^/]+)+$/
-const pathValid = (path) => typeof path === 'string' && pathPattern.test(path)
 const namePattern = /^[^/]+$/
 const nameValid = (name) => typeof name === 'string' && namePattern.test(name)
+const namePatternInfo = `match any string that does not contain '/'; regx: ${namePattern}`
+
+const pathPattern = /^(?:\/[^/]+)+$/
+const pathValid = (path) => typeof path === 'string' && pathPattern.test(path)
+const pathPatternInfo = `match any string that is made of '/' + <name>; regx: ${pathPattern}`
 
 function joinPath (path, name) {
   if (!pathValid(path)) throw errors.pathValidNo(path)
@@ -183,8 +186,8 @@ function batch (fs, { payloads }) {
 }
 
 const errors = {
-  pathValidNo: (path) => new Error(`path ${path} is not valid`),
-  nameValidNo: (name) => new Error(`name ${name} is not valid`),
+  pathValidNo: (path) => new Error(`path ${path} is not valid, ${pathPatternInfo}`),
+  nameValidNo: (name) => new Error(`name ${name} is not valid, ${namePatternInfo}`),
   pathExistNo: (path) => new Error(`path '${path}' does not exist`),
   pathExistYes: (path) => new Error(`path '${path}' already exists`),
   pathDirNo: (path) => new Error(`path '${path}' is not a dir`),
