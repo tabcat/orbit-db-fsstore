@@ -2,7 +2,7 @@
 # orbit-db-fsstore
 an orbit-db store representing a file system
 
-#### This is a custom [OrbitDB](https://github.com/orbitdb/orbit-db/) store ([add this store to your OrbitDB instance](https://github.com/tabcat/orbit-db-fsstore))
+#### This is a custom [OrbitDB](https://github.com/orbitdb/orbit-db/) store ([add this store to your OrbitDB instance](https://github.com/orbitdb/orbit-db/blob/main/API.md#orbitdbadddatabasetypetype-store))
 
 **IMPORTANT:** The fsstore creates a root directory named '/r' and every path must be built ontop/contained inside of this!
 
